@@ -958,8 +958,8 @@ def create_admin():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-
-
+        
+        # Создание администратора если его нет
         admin_exists = User.query.filter_by(username='admin').first()
         if not admin_exists:
             admin = User(username='admin', email='admin@example.com')
@@ -968,5 +968,7 @@ if __name__ == '__main__':
             db.session.add(admin)
             db.session.commit()
             print('Администратор создан: admin / admin123')
-
-    app.run(debug=True)
+    
+    # Для Render
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
