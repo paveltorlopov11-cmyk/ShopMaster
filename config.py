@@ -1,18 +1,18 @@
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
+from urllib.parse import urlparse
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///shop.db'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or os.urandom(24)
+    
+    # Для Render PostgreSQL
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+    
+    # Настройки загрузки файлов
     UPLOAD_FOLDER = os.path.join('static', 'uploads', 'products')
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max file size
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-
-    @staticmethod
-    def init_app(app):
-        # Create upload folder if not exists
-        os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
